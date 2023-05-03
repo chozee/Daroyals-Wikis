@@ -194,6 +194,30 @@ todo
 
 >> (empty)：套接字未连接。
 
+
+查找请求数请20个IP（常用于查找攻来源）
+```shell
+netstat -anlp|grep 80|grep tcp|awk '{print $5}'|awk -F: '{print $1}'|sort|uniq -c|sort -nr|head -n20
+
+netstat -ant |awk '/:80/{split($5,ip,":");++A[ip[1]]}END{for(i in A) print A[i],i}' |sort -rn|head -n20
+```
+
+## 用tcpdump嗅探80端口的访问看看谁最高
+
+```shell
+tcpdump -i eth0 -tnn dst port 80 -c 1000 | awk -F"." '{print $1"."$2"."$3"."$4}' | sort | uniq -c | sort -nr |head -20
+```
+
+查找较多time_wait连接
+```shell
+netstat -n|grep TIME_WAIT|awk '{print $5}'|sort|uniq -c|sort -rn|head -n20
+```
+
+找查较多的SYN连接
+```shell
+netstat -an | grep SYN | awk '{print $5}' | awk -F: '{print $1}' | sort | uniq -c | sort -nr | more
+```
+
 Reference
 https://wangchujiang.com/linux-command/c/netstat.html
 
